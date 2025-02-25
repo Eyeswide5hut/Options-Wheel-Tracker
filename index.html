@@ -5,61 +5,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <title>Options Wheel Tracker v1.0</title>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
             background-color: #121212;
             color: #ffffff;
+            font-family: Arial, sans-serif;
             text-align: center;
             padding: 20px;
         }
+
         button {
-            background-color: #008CBA;
-            color: white;
+            background-color: #1e88e5;
+            color: #fff;
             border: none;
             padding: 10px 20px;
             font-size: 18px;
             cursor: pointer;
-            margin-top: 20px;
             border-radius: 5px;
+            margin-top: 20px;
         }
+
         button:hover {
-            background-color: #005f7a;
+            background-color: #1565c0;
         }
+
         #loading {
             display: none;
-            margin-top: 10px;
-            font-size: 18px;
+            margin-top: 20px;
         }
+
         .screenshots {
             display: flex;
             justify-content: center;
             gap: 10px;
             margin-top: 20px;
         }
+
         .screenshot img {
-            width: 250px;
+            width: 200px;
             height: auto;
             border-radius: 8px;
         }
+
         footer {
             margin-top: 40px;
             font-size: 14px;
         }
-        footer a {
+
+        a {
             color: #ffcc00;
             text-decoration: none;
         }
-        footer a:hover {
+
+        a:hover {
             text-decoration: underline;
         }
     </style>
+    
+    <script type="module">
+        // Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth();
+
+        let clickCount = 0;
+
+        // Anonymous Sign-in
+        signInAnonymously(auth)
+            .then(() => {
+                console.log("✅ Signed in anonymously");
+            })
+            .catch((error) => {
+                console.error("❌ Authentication failed:", error);
+            });
+
+        // Once signed in, load the click count
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadClickCount();
+            }
+        });
+
+        // Load Click Count from Firebase
+        function loadClickCount() {
+            const clickCountRef = ref(database, 'clickCount');
+            get(clickCountRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    clickCount = snapshot.val();
+                    updateClickCountDisplay();
+                }
+            }).catch(error => {
+                console.error("❌ Error loading click count:", error);
+            });
+        }
+
+        // Update Click Count in Firebase
+        function updateClickCountInDatabase() {
+            const clickCountRef = ref(database, 'clickCount');
+            set(clickCountRef, clickCount);
+        }
+
+        // Function to handle button click
+        window.copySheet = function() {
+            clickCount++;
+            updateClickCountDisplay();
+            document.getElementById('loading').style.display = 'block';
+
+            // Redirect to Google Sheets copy link
+            window.location.href = "https://docs.google.com/spreadsheets/d/1FgT5nZNXwIZfnQ6LKFInakyxASRqvfNSmeV0lMMNwyo/copy";
+
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 1000);
+
+            updateClickCountInDatabase();
+        };
+
+        // Update Click Count Display
+        function updateClickCountDisplay() {
+            document.getElementById('clickCount').textContent = "Copies Initiated: " + clickCount;
+        }
+    </script>
 </head>
 <body>
-    <div class="container">
+    <div>
         <h1>Options Wheel Tracker v1.0</h1>
-        <p>An automated options tracking spreadsheet originally shared on r/OptionsWheel.</p>
-        <button id="copySheetButton">Copy Google Sheet</button>
+        <p>An automated options tracking spreadsheet, originally shared on r/OptionsWheel.</p>
+        <button onclick="copySheet()">Copy Google Sheet</button>
         <div id="loading">Processing... Please wait.</div>
         <div id="clickCount">Copies Initiated: 0</div>
 
@@ -77,85 +167,9 @@
         </div>
     </div>
 
-    <!-- Footer Section -->
+    <!-- Footer -->
     <footer>
         <p>Enjoying the tracker? <a href="https://buymeacoffee.com/fluki" target="_blank">Buy Me A Coffee</a>!</p>
     </footer>
-
-    <!-- Firebase Script -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-        // 🔥 Firebase Configuration - Replace with your actual credentials!
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID",
-            measurementId: "YOUR_MEASUREMENT_ID"
-        };
-
-        // ✅ Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-
-        let clickCount = 0;
-
-        // 📌 Load click count from Firebase on page load
-        async function loadClickCount() {
-            const clickCountRef = ref(database, 'clickCount');
-            try {
-                const snapshot = await get(clickCountRef);
-                if (snapshot.exists()) {
-                    clickCount = snapshot.val();
-                    updateClickCountDisplay();
-                }
-            } catch (error) {
-                console.error("Error loading click count:", error);
-            }
-        }
-
-        // 📌 Update click count in Firebase
-        async function updateClickCountInDatabase() {
-            const clickCountRef = ref(database, 'clickCount');
-            try {
-                await set(clickCountRef, clickCount);
-            } catch (error) {
-                console.error("Error updating click count:", error);
-            }
-        }
-
-        // 📌 Function to handle button click
-        async function copySheet() {
-            clickCount++;
-            updateClickCountDisplay();
-            document.getElementById('loading').style.display = 'block';
-
-            // Redirect to Google Sheets copy
-            window.location.href = "https://docs.google.com/spreadsheets/d/1FgT5nZNXwIZfnQ6LKFInakyxASRqvfNSmeV0lMMNwyo/copy";
-
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-            }, 1000);
-
-            // Save updated count to Firebase
-            await updateClickCountInDatabase();
-        }
-
-        // 📌 Function to update the displayed click count
-        function updateClickCountDisplay() {
-            document.getElementById('clickCount').textContent = `Copies Initiated: ${clickCount}`;
-        }
-
-        // 📌 Load count when page is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            loadClickCount();
-            document.getElementById('copySheetButton').addEventListener('click', copySheet);
-        });
-    </script>
 </body>
 </html>
