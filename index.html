@@ -27,51 +27,38 @@
             display: none;
             margin-top: 20px;
         }
+        #clickCount {
+            margin-top: 20px;
+            font-size: 16px;
+        }
     </style>
     <script>
+        let clickCount = 0; // Initialize click counter
+
         function copySheet() {
+            // Increment the click counter
+            clickCount++;
+            updateClickCountDisplay(); // Update the display
+
             // Show loading indicator if you wish
             document.getElementById('loading').style.display = 'block';
-            
-            // Create a unique callback function name
-            const callbackName = 'callback_' + new Date().getTime();
-            
-            // Define the callback function that will handle the response
-            window[callbackName] = function(data) {
-                console.log('Response received:', data);
-                
-                if (data.success) {
-                    // If the count was updated successfully, redirect to the Google Sheet copy page
-                    window.location.href = "https://docs.google.com/spreadsheets/d/1FgT5nZNXwIZfnQ6LKFInakyxASRqvfNSmeV0lMMNwyo/copy";
-                } else {
-                    // Handle error
-                    console.error("Error from server:", data.error);
-                    alert("Something went wrong. Please try again later.");
-                    document.getElementById('loading').style.display = 'none';
-                }
-                
-                // Clean up
-                delete window[callbackName];
-                document.body.removeChild(script);
-            };
-            
-            // Create a script element to make the JSONP request
-            const script = document.createElement('script');
-            // Replace with your new deployment URL
-            script.src = 'https://script.google.com/macros/s/AKfycby5L_U2ixQVqGDm7GMrvoIMEjVIcB7835owRnGUA-XD/dev' + callbackName;
-            
-            // Add error handling
-            script.onerror = function() {
-                console.error('Script loading failed');
-                alert('Failed to update count. Please try again later.');
+
+            // For now, just redirect to the copy page directly (no server-side interaction)
+            window.location.href = "https://docs.google.com/spreadsheets/d/1FgT5nZNXwIZfnQ6LKFInakyxASRqvfNSmeV0lMMNwyo/copy";
+
+            // Hide loading indicator after a short delay (optional, for visual feedback)
+            setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
-                document.body.removeChild(script);
-                delete window[callbackName];
-            };
-            
-            // Append to document to start the request
-            document.body.appendChild(script);
+            }, 1000); // Adjust delay as needed
         }
+
+        function updateClickCountDisplay() {
+            document.getElementById('clickCount').textContent = "Copies Initiated: " + clickCount;
+        }
+
+        // Initialize the display when the page loads (optional, if you want to start at 0)
+        document.addEventListener('DOMContentLoaded', updateClickCountDisplay);
+
     </script>
 </head>
 <body>
@@ -80,6 +67,9 @@
     <button onclick="copySheet()">Copy Google Sheet</button>
     <div id="loading">
         Processing... Please wait.
+    </div>
+    <div id="clickCount">
+        Copies Initiated: 0
     </div>
 </body>
 </html>
