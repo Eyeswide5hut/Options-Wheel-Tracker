@@ -27,7 +27,11 @@
         async function copySheet() {
             try {
                 // Send request to update count in Google Sheets
-                await fetch('https://script.google.com/macros/s/AKfycbwPQo4cvBZ1sgxKc07qonsu4zHhtGYl53OdyyyYrGftj5gT5YiHVyO5YzhbOtlCE5Di7w/exec');
+                const response = await fetch('https://script.google.com/macros/s/AKfycbwPQo4cvBZ1sgxKc07qonsu4zHhtGYl53OdyyyYrGftj5gT5YiHVyO5YzhbOtlCE5Di7w/exec');
+
+                if (!response.ok) {
+                    throw new Error('Failed to update count');
+                }
 
                 // Redirect to the "Make a Copy" link
                 window.location.href = "https://docs.google.com/spreadsheets/d/1FgT5nZNXwIZfnQ6LKFInakyxASRqvfNSmeV0lMMNwyo/copy";
