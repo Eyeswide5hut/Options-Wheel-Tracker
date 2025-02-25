@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copy My Google Sheet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        async function copySheet() {
+            try {
+                // Increment the copy count in Google Sheets
+                await fetch('https://script.google.com/macros/s/AKfycbwPQo4cvBZ1sgxKc07qonsu4zHhtGYl53OdyyyYrGftj5gT5YiHVyO5YzhbOtlCE5Di7w/exec');
+
+                // Redirect to Google Sheets "Make a copy" link
+                window.location.href = "https://docs.google.com/spreadsheets/d/Option-Wheel-Tracker-V1.0/copy";
+            } catch (error) {
+                console.error("Error updating count:", error);
+                alert("Something went wrong. Try again.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Get Access to the Google Sheet</h1>
+    <p>Click the button below to make a copy of the Google Sheet.</p>
+    <button onclick="copySheet()">Copy Google Sheet</button>
+</body>
+</html>
