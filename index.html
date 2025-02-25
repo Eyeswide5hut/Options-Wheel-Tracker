@@ -37,7 +37,7 @@
         button {
             font-size: 20px;
             padding: 15px 30px;
-            background-color: #27ae60;
+            background-color: #f39c12; /* Yellow color */
             color: white;
             border: none;
             border-radius: 8px;
@@ -47,12 +47,12 @@
         }
 
         button:hover {
-            background-color: #2ecc71;
+            background-color: #f1c40f; /* Lighter yellow on hover */
             transform: scale(1.05);
         }
 
         button:active {
-            background-color: #16a085;
+            background-color: #e67e22; /* Darker yellow on active */
         }
 
         /* Loading Indicator */
@@ -133,6 +133,24 @@
                 opacity: 1;
             }
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .screenshots {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .screenshot {
+                width: 80%;
+                margin-bottom: 20px;
+            }
+
+            button {
+                width: 80%;
+                font-size: 18px;
+            }
+        }
     </style>
     <script>
         let clickCount = 0;
@@ -164,9 +182,15 @@
         
         <!-- Screenshot Section -->
         <div class="screenshots">
-            <div class="screenshot">Screenshot 1</div>
-            <div class="screenshot">Screenshot 2</div>
-            <div class="screenshot">Screenshot 3</div>
+            <div class="screenshot">
+                <img src="images/screenshot1.png" alt="Screenshot 1" style="width: 100%; height: auto; border-radius: 8px;">
+            </div>
+            <div class="screenshot">
+                <img src="images/screenshot2.png" alt="Screenshot 2" style="width: 100%; height: auto; border-radius: 8px;">
+            </div>
+            <div class="screenshot">
+                <img src="images/screenshot3.png" alt="Screenshot 3" style="width: 100%; height: auto; border-radius: 8px;">
+            </div>
         </div>
     </div>
 
