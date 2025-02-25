@@ -26,14 +26,14 @@
     <script>
         async function copySheet() {
             try {
-                // Increment the copy count in Google Sheets
-                await fetch('https://script.google.com/macros/s/AKfycbwPQo4cvBZ1sgxKc07qonsu4zHhtGYl53OdyyyYrGftj5gT5YiHVyO5YzhbOtlCE5Di7w/exec');
+                // Send request to update count in Google Sheets (Replace YOUR_WEB_APP_URL)
+                await fetch('YOUR_WEB_APP_URL');
 
-                // Redirect to Google Sheets "Make a copy" link
-                window.location.href = "https://docs.google.com/spreadsheets/d/Option-Wheel-Tracker-V1.0/copy";
+                // Redirect to the "Make a Copy" link
+                window.location.href = "https://docs.google.com/spreadsheets/d/1FgT5nZNXwIZfnQ6LKFInakyxASRqvfNSmeV0lMMNwyo/copy";
             } catch (error) {
                 console.error("Error updating count:", error);
-                alert("Something went wrong. Try again.");
+                alert("Something went wrong. Please try again later.");
             }
         }
     </script>
