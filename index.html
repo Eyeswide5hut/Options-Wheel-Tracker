@@ -4,72 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <title>Copy My Google Sheet</title>
+    <title>Options Wheel Tracker v1.0</title>
     <style>
+        /* Base Styles */
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
-        button {
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
             font-size: 18px;
-            padding: 10px 20px;
-            background-color: #007bff;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        /* Button Styling */
+        button {
+            font-size: 20px;
+            padding: 15px 30px;
+            background-color: #5cb85c;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
+
         button:hover {
-            background-color: #0056b3;
+            background-color: #4cae4c;
+            transform: scale(1.05);
         }
+
+        button:active {
+            background-color: #398439;
+        }
+
+        /* Loading Indicator */
         #loading {
             display: none;
+            font-size: 18px;
             margin-top: 20px;
+            color: #666;
         }
+
+        /* Click Count */
         #clickCount {
-            margin-top: 20px;
-            font-size: 16px;
+            margin-top: 30px;
+            font-size: 18px;
+            color: #777;
+        }
+
+        /* Card Effect */
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        /* Subtle Animation */
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
     </style>
     <script>
-        let clickCount = 0; // Initialize click counter
+        let clickCount = 0;
 
         function copySheet() {
-            // Increment the click counter
             clickCount++;
-            updateClickCountDisplay(); // Update the display
-
-            // Show loading indicator if you wish
+            updateClickCountDisplay();
             document.getElementById('loading').style.display = 'block';
-
-            // For now, just redirect to the copy page directly (no server-side interaction)
             window.location.href = "https://docs.google.com/spreadsheets/d/1FgT5nZNXwIZfnQ6LKFInakyxASRqvfNSmeV0lMMNwyo/copy";
-
-            // Hide loading indicator after a short delay (optional, for visual feedback)
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
-            }, 1000); // Adjust delay as needed
+            }, 1000);
         }
 
         function updateClickCountDisplay() {
             document.getElementById('clickCount').textContent = "Copies Initiated: " + clickCount;
         }
 
-        // Initialize the display when the page loads (optional, if you want to start at 0)
         document.addEventListener('DOMContentLoaded', updateClickCountDisplay);
-
     </script>
 </head>
 <body>
-    <h1>Get Access to the Google Sheet</h1>
-    <p>Click the button below to make a copy of the Google Sheet.</p>
-    <button onclick="copySheet()">Copy Google Sheet</button>
-    <div id="loading">
-        Processing... Please wait.
-    </div>
-    <div id="clickCount">
-        Copies Initiated: 0
+    <div class="container fade-in">
+        <h1>Options Wheel Tracker v1.0</h1>
+        <p>Your go-to tool for tracking and managing options wheel strategies.</p>
+        <button onclick="copySheet()">Copy Google Sheet</button>
+        <div id="loading">Processing... Please wait.</div>
+        <div id="clickCount">Copies Initiated: 0</div>
     </div>
 </body>
 </html>
