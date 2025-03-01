@@ -284,32 +284,32 @@
         }
         
         .support-link {
-    display: inline-flex;
-    align-items: center;
-    color: white;
-    font-weight: 500;
-    text-decoration: none;
-    padding: 8px 16px;
-    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 184, 148, 0.15);
-}
-
-.support-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 184, 148, 0.25);
-}
-
-.support-link:active {
-    transform: translateY(0);
-}
-
-.support-icon {
-    margin-right: 8px;
-    color: white;
-}
-
+            display: inline-flex;
+            align-items: center;
+            color: white;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.15);
+        }
+        
+        .support-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 184, 148, 0.25);
+        }
+        
+        .support-link:active {
+            transform: translateY(0);
+        }
+        
+        .support-icon {
+            margin-right: 8px;
+            color: white;
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2rem;
@@ -334,7 +334,7 @@
     <script type="module">
         // Import Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+        import { getDatabase, ref, get, set, runTransaction } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js";
 
         // Firebase Configuration
@@ -365,46 +365,65 @@
                 console.error("❌ Authentication failed:", error);
             });
 
-        // Once signed in, load the click count
+        // Load click count after authentication
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                loadClickCount();
+                loadClickCount().then(() => {
+                    updateClickCountDisplay(); // Update UI only after data is loaded
+                });
             }
         });
 
         // Load Click Count from Firebase
-        function loadClickCount() {
+        async function loadClickCount() {
             const clickCountRef = ref(database, 'clickCount');
-            get(clickCountRef).then(snapshot => {
+            try {
+                const snapshot = await get(clickCountRef);
                 if (snapshot.exists()) {
                     clickCount = snapshot.val();
-                    updateClickCountDisplay();
+                    console.log("✅ Loaded clickCount from Firebase:", clickCount);
+                } else {
+                    clickCount = 0;
+                    await set(clickCountRef, clickCount);
+                    console.log("✅ Initialized clickCount in Firebase to 0");
                 }
-            }).catch(error => {
+            } catch (error) {
                 console.error("❌ Error loading click count:", error);
-            });
+            }
         }
 
-        // Update Click Count in Firebase
-        function updateClickCountInDatabase() {
+        // Update Click Count in Firebase using a transaction
+        async function updateClickCountInDatabase() {
             const clickCountRef = ref(database, 'clickCount');
-            set(clickCountRef, clickCount);
+            try {
+                await runTransaction(clickCountRef, (currentCount) => {
+                    console.log("🔄 Transaction read currentCount:", currentCount);
+                    return (currentCount || 0) + 1; // Increment the current value, default to 0 if null
+                });
+                const snapshot = await get(clickCountRef); // Fetch the updated value
+                clickCount = snapshot.val();
+                console.log("✅ Transaction completed, new clickCount:", clickCount);
+            } catch (error) {
+                console.error("❌ Error in transaction:", error);
+            }
         }
 
         // Function to handle button click
-        window.copySheet = function() {
-            clickCount++;
-            updateClickCountDisplay();
+        window.copySheet = async function() {
             document.getElementById('loading').style.display = 'block';
 
-            // Redirect to Google Sheets copy link
+            // Update Firebase first
+            await updateClickCountInDatabase();
+
+            // Update UI with the new value
+            updateClickCountDisplay();
+
+            // Redirect after Firebase update is confirmed
             window.location.href = "https://docs.google.com/spreadsheets/d/1FgT5nZNXwIZfnQ6LKFInakyxASRqvfNSmeV0lMMNwyo/copy";
 
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
             }, 1000);
-
-            updateClickCountInDatabase();
         };
 
         // Update Click Count Display
@@ -421,7 +440,6 @@
                     <div class="logo-icon"></div>
                     The<span></span>Options<span>Wheel</span>
                 </div>
-                
             </div>
         </div>
     </header>
@@ -498,25 +516,25 @@
     </main>
 
     <footer>
-    <div class="container">
-        <div class="footer-content">
-            <div class="copyright">
-                &copy; 2025 The WallStreet Wheel | Originally shared on <a href="https://www.reddit.com/r/Optionswheel/" target="_blank">r/OptionsWheel</a>
-            </div>
-            <div class="social-links">
-                <a href="https://buymeacoffee.com/fluki" target="_blank" class="support-link">
-                    <svg class="support-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                        <line x1="6" y1="1" x2="6" y2="4"></line>
-                        <line x1="10" y1="1" x2="10" y2="4"></line>
-                        <line x1="14" y1="1" x2="14" y2="4"></line>
-                    </svg>
-                    Support Project
-                </a>
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    © 2025 The WallStreet Wheel | Originally shared on <a href="https://www.reddit.com/r/Optionswheel/" target="_blank">r/OptionsWheel</a>
+                </div>
+                <div class="social-links">
+                    <a href="https://buymeacoffee.com/fluki" target="_blank" class="support-link">
+                        <svg class="support-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                            <line x1="6" y1="1" x2="6" y2="4"></line>
+                            <line x1="10" y1="1" x2="10" y2="4"></line>
+                            <line x1="14" y1="1" x2="14" y2="4"></line>
+                        </svg>
+                        Support Project
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
 </body>
 </html>
